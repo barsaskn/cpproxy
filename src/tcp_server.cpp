@@ -1,6 +1,15 @@
-#include "TCPServer.hpp"
+#include "tcp_server.hpp"
+
+TCPServer::TCPServer(int port) {
+    this->running = false;
+    this->port = port;
+    this->activeBridges = new std::vector<ConnectionBridge*>();
+}
 
 int TCPServer::run() {
+    std::thread checkBridgesThread = std::thread(&TCPServer::checkBridges, this);
+    checkBridgesThread.detach();
+    
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
         std::cerr << "[TCPServer] Error creating socket." << std::endl;
@@ -37,5 +46,25 @@ int TCPServer::run() {
             continue;
         }
         std::cout << "[TCPServer] New client: " << clientSocket << std::endl;
+        ConnectionBridge* connectionBridge = new ConnectionBridge(clientSocket); //mem leak 
+        this->activeBridges->push_back(connectionBridge);
+        connectionBridge->run();
+    }
+    return 0;
+}
+
+void TCPServer::checkBridges() {
+    std::cout << "[TCPServer] Check Bridge thread started." << std::endl;
+    while (true) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        for (auto it = this->activeBridges->begin(); it != this->activeBridges->end(); ) {
+            std::unique_lock<std::mutex> lock(this->checkBridgeMutex);
+            if (!(*it)->isRunning()) {
+                it = this->activeBridges->erase(it);
+                delete (*it);
+                continue;
+            } 
+            ++it;
+        }
     }
 }

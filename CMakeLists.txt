@@ -8,10 +8,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(SOURCES
     src/main.cpp
     src/tcp_server.cpp
+    src/connection_bridge.cpp
 )
 
 set(HEADERS
     include/tcp_server.hpp
+    include/connection_bridge.hpp
 )
 
 include_directories(include)
