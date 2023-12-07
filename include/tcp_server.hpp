@@ -23,6 +23,7 @@ private:
     int serverSocket;
     std::vector<ConnectionBridge*>* activeBridges;
     std::mutex checkBridgeMutex;
+    std::mutex createBridgeMutex;
 };
 
 #endif // _TCP_SERVER_HPP

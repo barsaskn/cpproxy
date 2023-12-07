@@ -18,8 +18,9 @@ public:
 
 private:
     void listenClientSocket();
-
+    void parseMessage();
     int clientSocket;
+    int remoteSocket;
     std::atomic<bool> running;
     std::thread clientSocketListenThread;
 };

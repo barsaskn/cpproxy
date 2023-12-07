@@ -3,6 +3,7 @@
 ConnectionBridge::ConnectionBridge(int clientSocket) {
     this->clientSocket = clientSocket;
     this->running = true;
+    std::cout << "[ConnectionBridge] Object created." << std::endl;
 }
 
 ConnectionBridge::~ConnectionBridge() {
@@ -24,9 +25,7 @@ void ConnectionBridge::listenClientSocket() {
     char buffer[1024];
     int bytesRead;
     while ((bytesRead = recv(this->clientSocket, buffer, sizeof(buffer), 0)) > 0) {
-        std::cout << "[ConnectionBridge] Received data from client: " << std::string(buffer, bytesRead) << std::endl;
-        const char* response = "Hello, Client! Received Your Message\n";
-        send(this->clientSocket, response, strlen(response), 0);
+        //std::cout << "[ConnectionBridge] Received data from client: " << std::string(buffer, bytesRead) << std::endl;
     }
     std::cout << "[ConnectionBridge] Listening of the socket ended." << std::endl;
     this->running = false;
