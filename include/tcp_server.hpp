@@ -22,8 +22,7 @@ private:
     bool running;
     int serverSocket;
     std::vector<ConnectionBridge*>* activeBridges;
-    std::mutex checkBridgeMutex;
-    std::mutex createBridgeMutex;
+    std::mutex vectorMutex;
 };
 
 #endif // _TCP_SERVER_HPP

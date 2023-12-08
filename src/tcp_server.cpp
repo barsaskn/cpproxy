@@ -46,7 +46,7 @@ int TCPServer::run() {
             continue;
         }
         std::cout << "[TCPServer] New client: " << clientSocket << std::endl;
-        std::unique_lock<std::mutex> lock(this->checkBridgeMutex);
+        std::unique_lock<std::mutex> lock(this->vectorMutex);
         ConnectionBridge* connectionBridge = new ConnectionBridge(clientSocket); 
         this->activeBridges->push_back(connectionBridge);
         connectionBridge->run();
@@ -58,7 +58,7 @@ void TCPServer::checkBridges() {
     std::cout << "[TCPServer] Check Bridge thread started." << std::endl;
     while (true) {
         //std::this_thread::sleep_for(std::chrono::seconds(1));//core dump if comment out
-        std::unique_lock<std::mutex> lock(this->checkBridgeMutex);
+        std::unique_lock<std::mutex> lock(this->vectorMutex);
         for (auto it = this->activeBridges->begin(); it != this->activeBridges->end(); ) {
             if (!(*it)->isRunning()) {
                 delete *it;

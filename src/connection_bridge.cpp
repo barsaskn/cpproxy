@@ -25,7 +25,7 @@ void ConnectionBridge::listenClientSocket() {
     char buffer[1024];
     int bytesRead;
     while ((bytesRead = recv(this->clientSocket, buffer, sizeof(buffer), 0)) > 0) {
-        //std::cout << "[ConnectionBridge] Received data from client: " << std::string(buffer, bytesRead) << std::endl;
+        std::cout << "[ConnectionBridge] Received data from client: " << std::string(buffer, bytesRead) << std::endl;
     }
     std::cout << "[ConnectionBridge] Listening of the socket ended." << std::endl;
     this->running = false;
