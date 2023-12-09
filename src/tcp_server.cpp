@@ -6,6 +6,18 @@ TCPServer::TCPServer(int port) {
     this->activeBridges = new std::vector<ConnectionBridge*>();
 }
 
+TCPServer::~TCPServer() {
+    std::unique_lock<std::mutex> lock(this->vectorMutex);
+    this->running = false;
+    for (auto it = this->activeBridges->begin(); it != this->activeBridges->end(); ) {
+        delete *it;
+        it = this->activeBridges->erase(it);
+        ++it;
+    }  
+    close(this->serverSocket);
+    std::cout << "[TCPServer] Object deleted." << std::endl;
+}
+
 int TCPServer::run() {
     std::thread checkBridgesThread = std::thread(&TCPServer::checkBridges, this);
     checkBridgesThread.detach();

@@ -1,8 +1,17 @@
+#include <cstdlib>
 #include "tcp_server.hpp"
 
+TCPServer* tcpServer;
+
+void exitFunction(int signum) {
+    delete tcpServer;
+    std::cout << "[MAIN] App is closing" << std::endl;
+}
+
 int main() {
-    TCPServer* tcpServer = new TCPServer(8080);
+    //atexit(exitFunction);
+    signal(SIGINT, exitFunction);
+    tcpServer = new TCPServer(8080);
     tcpServer->run();
-    std::cout << "server";
     return 0;
 }

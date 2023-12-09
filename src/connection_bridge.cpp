@@ -7,6 +7,8 @@ ConnectionBridge::ConnectionBridge(int clientSocket) {
 }
 
 ConnectionBridge::~ConnectionBridge() {
+    close(clientSocket);
+    close(remoteSocket);
     std::cout << "[ConnectionBridge] Object deleted." << std::endl;
 }
 
@@ -25,9 +27,19 @@ void ConnectionBridge::listenClientSocket() {
     char buffer[1024];
     int bytesRead;
     while ((bytesRead = recv(this->clientSocket, buffer, sizeof(buffer), 0)) > 0) {
-        std::cout << "[ConnectionBridge] Received data from client: " << std::string(buffer, bytesRead) << std::endl;
+        //std::cout << "[ConnectionBridge] Received data from client: " << std::string(buffer, bytesRead) << std::endl;
+        if(this->isConnectMethod(buffer, bytesRead)){
+        }
     }
     std::cout << "[ConnectionBridge] Listening of the socket ended." << std::endl;
     this->running = false;
-    close(clientSocket);
+}
+
+bool ConnectionBridge::isConnectMethod(char* buffer, int buffersize) {
+    std::string method = std::string(buffer, 7);
+    std::cout << "[METHOD] " << method << std::endl;
+    if(method == "CONNECT") {
+        return true;
+    }
+    return false;
 }

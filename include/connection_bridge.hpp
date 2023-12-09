@@ -18,9 +18,11 @@ public:
 
 private:
     void listenClientSocket();
-    void parseMessage();
+    bool isConnectMethod(char* buffer, int size);
+
+
     int clientSocket;
-    int remoteSocket;
+    int remoteSocket = -1;
     std::atomic<bool> running;
     std::thread clientSocketListenThread;
 };
