@@ -5,11 +5,12 @@ TCPServer* tcpServer;
 
 void exitFunction(int signum) {
     delete tcpServer;
-    std::cout << "[MAIN] App is closing" << std::endl;
+    std::cout << "[MAIN] App is closing..." << std::endl;
 }
 
 int main() {
-    //atexit(exitFunction);
+    
+    std::cout << "[MAIN] App is starting..." << std::endl;
     signal(SIGINT, exitFunction);
     tcpServer = new TCPServer(8080);
     tcpServer->run();

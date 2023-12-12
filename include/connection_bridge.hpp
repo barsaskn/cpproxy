@@ -19,9 +19,10 @@ public:
 private:
     void listenClientSocket();
     bool isConnectMethod(char* buffer, int size);
+    std::string parseHost(char* buffer, int size);
 
 
-    int clientSocket;
+    int clientSocket = -1;
     int remoteSocket = -1;
     std::atomic<bool> running;
     std::thread clientSocketListenThread;
