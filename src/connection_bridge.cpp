@@ -32,7 +32,7 @@ void ConnectionBridge::listenClientSocket() {
         std::cout << "[ConnectionBridge] Received data from client: " << std::string(buffer, bytesRead) << std::endl;
         if(this->isConnectMethod(buffer, bytesRead)){
             std::string host = this->parseHost(buffer, bytesRead);
-            std::cout << "[ConnectionBridge] Parsed host: " << host << std::endl;
+            std::cout << "[ConnectionBridge] Parsed host: <" << host << ">" << std::endl;
         }
     }
     std::cout << "[ConnectionBridge] Listening client thread stopped." << std::endl;
@@ -48,21 +48,22 @@ bool ConnectionBridge::isConnectMethod(char* buffer, int buffersize) {
 }
 
 std::string ConnectionBridge::parseHost(char* buffer, int buffersize) {
-    if (buffer == nullptr || buffersize <= 0) {
-        return ""; 
+    std::string bufferString(buffer, buffersize);
+    size_t newlinePos = bufferString.find('\n');
+    std::string firstLine = "";
+    if (newlinePos != std::string::npos) {
+        firstLine = bufferString.substr(0, newlinePos);
     }
-
-    const char* start = std::strstr(buffer, "Host:");
-    if (start == nullptr) {
-        return ""; 
+    std::string result = "";
+    bool addFlag = false;
+    for (size_t i = 0; i < firstLine.size(); i++) {
+        if(firstLine.at(i) == ' '){
+            addFlag = !addFlag;
+            continue;
+        }
+        if(addFlag) {
+            result += firstLine.at(i);
+        }
     }
-
-    start += 5; 
-    const char* end = std::strchr(start, '\n'); 
-    if (end == nullptr) {
-        end = buffer + buffersize; 
-    }
-    std::string host(start, end - start);
-
-    return host;
+    return result;
 }
