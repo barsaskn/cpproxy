@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <csignal>
 #include "tcp_server.hpp"
 
 TCPServer* tcpServer;
