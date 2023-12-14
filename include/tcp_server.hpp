@@ -19,10 +19,11 @@ private:
     void checkBridges();
 
     int port;
-    std::atomic<bool> running;
+    bool running = false;
     int serverSocket;
     std::vector<ConnectionBridge*>* activeBridges;
     std::mutex vectorMutex;
+    std::mutex runningMutex;
     std::thread checkBridgesThread;
 };
 

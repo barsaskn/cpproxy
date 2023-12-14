@@ -20,7 +20,7 @@ private:
     void listenClientSocket();
     bool isConnectMethod(char* buffer, int size);
     std::string parseHost(char* buffer, int size);
-
+    void createTlsConnection(std::string& host);
 
     int clientSocket = -1;
     int remoteSocket = -1;

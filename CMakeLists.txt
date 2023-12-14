@@ -4,6 +4,7 @@ project(CpProxy)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+add_compile_options(-O0 -g)
 
 set(SOURCES
     src/main.cpp

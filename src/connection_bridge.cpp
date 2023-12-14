@@ -33,6 +33,7 @@ void ConnectionBridge::listenClientSocket() {
         if(this->isConnectMethod(buffer, bytesRead)){
             std::string host = this->parseHost(buffer, bytesRead);
             std::cout << "[ConnectionBridge] Parsed host: <" << host << ">" << std::endl;
+            this->createTlsConnection(host);
         }
     }
     std::cout << "[ConnectionBridge] Listening client thread stopped." << std::endl;
@@ -66,4 +67,8 @@ std::string ConnectionBridge::parseHost(char* buffer, int buffersize) {
         }
     }
     return result;
+}
+
+void ConnectionBridge::createTlsConnection(std::string& host) {
+
 }

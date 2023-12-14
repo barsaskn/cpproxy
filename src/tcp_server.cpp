@@ -7,13 +7,15 @@ TCPServer::TCPServer(int port) {
 }
 
 TCPServer::~TCPServer() {
+    this->runningMutex.lock();
     this->running = false;
+    this->runningMutex.unlock();
     this->vectorMutex.lock();
     for (auto it = this->activeBridges->begin(); it != this->activeBridges->end();) {
         delete (*it);
         it = this->activeBridges->erase(it);
         continue;
-    }  
+    }
     if (close(serverSocket) == 0) {
         std::cout << "[TCPServer] Socket closed successfully." << std::endl;
     }
@@ -57,11 +59,16 @@ int TCPServer::run() {
     }
 
     std::cout << "[TCPServer] Socket listening for new clients." << std::endl;
-
-    while (running) {
+    while (this->running) {
+        this->runningMutex.lock();
+        if(!this->running){
+            this->runningMutex.unlock();
+            break;
+        }
+        this->runningMutex.unlock();
         int clientSocket = accept(serverSocket, NULL, NULL);
         if (clientSocket == -1) {
-            std::cerr << "[TCPServer] Error accepting client connection" << std::endl;
+            std::cerr << "[TCPServer] Error accepting client connection. Running: " << this->running << std::endl;
             continue;
         }
         std::cout << "[TCPServer] New client: " << clientSocket << std::endl;
