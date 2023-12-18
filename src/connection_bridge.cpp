@@ -8,7 +8,12 @@ ConnectionBridge::ConnectionBridge(int clientSocket) {
 
 ConnectionBridge::~ConnectionBridge() {
     this->running = false;
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    if(this->clientSocketListenThread.joinable()) {
+        this->clientSocketListenThread.join();
+    }
+    if(this->remoteSocketListenThread.joinable()) {
+        this->clientSocketListenThread.join();
+    }
     close(clientSocket);
     close(remoteSocket);
     std::cout << "[ConnectionBridge] Object deleted." << std::endl;
@@ -122,8 +127,8 @@ void ConnectionBridge::createTcpConnection(std::string& host) {
         return;
     }
     std::cout << "[ConnectionBridge] Connection successful to host: " << host << std::endl;
-    std::thread thread = std::thread(&ConnectionBridge::listenRemoteSocket, this);
-    thread.detach();
+    this->remoteSocketListenThread = std::thread(&ConnectionBridge::listenRemoteSocket, this);
+    this->remoteSocketListenThread.detach();
 }
 
 void ConnectionBridge::writeToClientSocket(char* data, size_t dataSize) {

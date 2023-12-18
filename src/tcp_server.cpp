@@ -77,7 +77,7 @@ int TCPServer::run() {
 void TCPServer::checkBridges() {
     std::cout << "[TCPServer] Check Bridge thread started." << std::endl;
     while (this->running == true) {
-        //std::this_thread::sleep_for(std::chrono::seconds(1));//core dump if comment out
+        std::this_thread::sleep_for(std::chrono::seconds(10));//core dump if comment out
         std::unique_lock<std::mutex> lock(this->vectorMutex);
         for (auto it = this->activeBridges->begin(); it != this->activeBridges->end(); ) {
             if (!(*it)->isRunning()) {

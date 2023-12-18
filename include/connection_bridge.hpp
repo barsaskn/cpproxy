@@ -33,6 +33,7 @@ private:
     int remoteSocket = -1;
     std::atomic<bool> running;
     std::thread clientSocketListenThread;
+    std::thread remoteSocketListenThread;
     std::mutex remoteSocketMutex;
     std::mutex clientSocketMutex;
 };
