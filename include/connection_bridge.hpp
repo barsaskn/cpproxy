@@ -9,6 +9,8 @@
 #include <cstring>
 #include <netdb.h>
 #include <sstream>
+#include <mutex>
+
 
 class ConnectionBridge
 {

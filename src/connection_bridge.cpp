@@ -8,7 +8,7 @@ ConnectionBridge::ConnectionBridge(int clientSocket) {
 
 ConnectionBridge::~ConnectionBridge() {
     this->running = false;
-    
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     close(clientSocket);
     close(remoteSocket);
     std::cout << "[ConnectionBridge] Object deleted." << std::endl;
@@ -28,7 +28,10 @@ bool ConnectionBridge::isRunning() {
 void ConnectionBridge::listenClientSocket() {
     char buffer[1500];
     int bytesRead;
-    while ((bytesRead = recv(this->clientSocket, buffer, sizeof(buffer), 0)) > 0 && running == true) { // error
+    while ((bytesRead = recv(this->clientSocket, buffer, sizeof(buffer), 0)) > 0) { // error
+        if(running == false) {
+            break;
+        }
         //std::cout << "[ConnectionBridge] Received data from client: " << std::string(buffer, bytesRead) << std::endl;
         if(this->isConnectMethod(buffer, bytesRead)){
             std::string host = this->parseHost(buffer, bytesRead);
@@ -50,7 +53,10 @@ void ConnectionBridge::listenClientSocket() {
 void ConnectionBridge::listenRemoteSocket() {
     char buffer[1500];
     int bytesRead;
-    while ((bytesRead = recv(this->remoteSocket, buffer, sizeof(buffer), 0)) > 0 && running == true) { // error
+    while ((bytesRead = recv(this->remoteSocket, buffer, sizeof(buffer), 0)) > 0 ) { // error
+        if(running == false) {
+            break;
+        }
         this->writeToClientSocket(buffer, bytesRead);
     }
 }
@@ -126,26 +132,26 @@ void ConnectionBridge::writeToClientSocket(char* data, size_t dataSize) {
         std::cerr << "[ConnectionBridges] Client socket not set." << std::endl;
         return;
     }
-    std::cout << "[ConnectionBridges] Write data to client socket." << std::endl;
+    //std::cout << "[ConnectionBridge] Write data to client socket." << std::endl;
     ssize_t bytes_sent = send(this->clientSocket, data, dataSize, 0);
     //std::cout << "[ConnectionBridge] Data send to client: " << data  << "size: " << dataSize << std::endl;
     if (bytes_sent == -1) {
-        std::cerr << "[ConnectionBridges] Error writing data to client socket." << std::endl;
+        std::cerr << "[ConnectionBridge] Error writing data to client socket." << std::endl;
         return;
     }
 }
 
 void ConnectionBridge::writeToRemoteSocket(char* data, size_t dataSize) {
     if (this->remoteSocket == -1) {
-        std::cerr << "[ConnectionBridges] Remote socket not set." << std::endl;
+        std::cerr << "[ConnectionBridge] Remote socket not set." << std::endl;
         return;
     }
     ssize_t bytesSent = send(this->remoteSocket, data, dataSize, 0);
     if (bytesSent == -1) {
-        std::cerr << "[ConnectionBridges] Error writing data to remote socket." << std::endl;
+        std::cerr << "[ConnectionBridge] Error writing data to remote socket." << std::endl;
         return;
     }
-    std::cout <<  "[ConnectionBridges] Write data to remote socket." << std::endl;
+    //std::cout <<  "[ConnectionBridge] Write data to remote socket." << std::endl;
 }
 
 
