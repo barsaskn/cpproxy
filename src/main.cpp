@@ -4,15 +4,21 @@
 
 TCPServer* tcpServer;
 
-void exitFunction(int signum) {
-    delete tcpServer;
-    std::cout << "[MAIN] App is closing..." << std::endl;
+void handleSignal(int signum) {
+    if(signum == SIGINT){
+        delete tcpServer;
+        std::cout << "[MAIN] App is closing..." << std::endl;
+    }
+    else if (signum == SIGPIPE){
+        std::cout << "[MAIN] SIGPIPE signal emmited" << std::endl;
+    }
+
 }
 
 int main() {
-    
     std::cout << "[MAIN] App is starting..." << std::endl;
-    signal(SIGINT, exitFunction);
+    signal(SIGINT, handleSignal);
+    signal(SIGPIPE, handleSignal );
     tcpServer = new TCPServer(8080);
     tcpServer->run();
     return 0;
