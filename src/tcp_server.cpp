@@ -8,7 +8,8 @@ TCPServer::TCPServer(int port) {
 
 TCPServer::~TCPServer() {
     this->running = false;
-    this->vectorMutex.lock();
+    shutdown(this->serverSocket, SHUT_RDWR);
+    std::unique_lock<std::mutex> lock(this->vectorMutex);
     for (auto it = this->activeBridges->begin(); it != this->activeBridges->end();) {
         delete (*it);
         it = this->activeBridges->erase(it);
@@ -60,7 +61,7 @@ int TCPServer::run() {
     while (this->running == true) {
         int clientSocket = accept(serverSocket, NULL, NULL);
         if (clientSocket == -1) {
-            std::cerr << "[TCPServer] Error accepting client connection. Running: " << this->running << std::endl;
+            std::cerr << "[TCPServer] Error accepting client connection." << std::endl;
             continue;
         }
         std::cout << "[TCPServer] New client: " << clientSocket << std::endl;
@@ -77,7 +78,7 @@ int TCPServer::run() {
 void TCPServer::checkBridges() {
     std::cout << "[TCPServer] Check Bridge thread started." << std::endl;
     while (this->running == true) {
-        std::this_thread::sleep_for(std::chrono::seconds(10));//core dump if comment out
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         std::unique_lock<std::mutex> lock(this->vectorMutex);
         for (auto it = this->activeBridges->begin(); it != this->activeBridges->end(); ) {
             if (!(*it)->isRunning()) {
@@ -87,6 +88,7 @@ void TCPServer::checkBridges() {
             } 
             ++it;
         }
+        lock.unlock();
     }
     std::cout << "[TCPServer] Check Bridge thread stopped." << std::endl;
 }

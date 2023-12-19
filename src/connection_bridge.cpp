@@ -8,11 +8,13 @@ ConnectionBridge::ConnectionBridge(int clientSocket) {
 
 ConnectionBridge::~ConnectionBridge() {
     this->running = false;
+    shutdown(this->clientSocket, SHUT_RDWR);
+    shutdown(this->remoteSocket, SHUT_RDWR);
     if(this->clientSocketListenThread.joinable()) {
         this->clientSocketListenThread.join();
     }
     if(this->remoteSocketListenThread.joinable()) {
-        this->clientSocketListenThread.join();
+        this->remoteSocketListenThread.join();
     }
     close(clientSocket);
     close(remoteSocket);
@@ -21,7 +23,7 @@ ConnectionBridge::~ConnectionBridge() {
 
 int ConnectionBridge::run(){
     this->clientSocketListenThread = std::thread(&ConnectionBridge::listenClientSocket, this);
-    this->clientSocketListenThread.detach();
+    //this->clientSocketListenThread.detach();
     std::cout << "[ConnectionBridge] Client listening thread started." << std::endl;
     return 0;
 }
@@ -64,6 +66,7 @@ void ConnectionBridge::listenRemoteSocket() {
         }
         this->writeToClientSocket(buffer, bytesRead);
     }
+    std::cout << "[ConnectionBridge] Listening remote thread stopped." << std::endl;
 }
 
 bool ConnectionBridge::isConnectMethod(char* buffer, int buffersize) {
@@ -128,7 +131,7 @@ void ConnectionBridge::createTcpConnection(std::string& host) {
     }
     std::cout << "[ConnectionBridge] Connection successful to host: " << host << std::endl;
     this->remoteSocketListenThread = std::thread(&ConnectionBridge::listenRemoteSocket, this);
-    this->remoteSocketListenThread.detach();
+    //this->remoteSocketListenThread.detach();
 }
 
 void ConnectionBridge::writeToClientSocket(char* data, size_t dataSize) {
