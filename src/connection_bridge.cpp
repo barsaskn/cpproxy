@@ -9,16 +9,12 @@ ConnectionBridge::ConnectionBridge(int clientSocket) {
 ConnectionBridge::~ConnectionBridge() {
     this->running = false;
     if(this->clientSocketListenThread.joinable()) {
-        std::cout << "[ConnectionBridge] Client socket thread joined." << std::endl;
         this->clientSocketListenThread.join();
     }
     if(this->remoteSocketListenThread.joinable()) {
-        std::cout << "[ConnectionBridge] Remote socket thread joined." << std::endl;
-        this->remoteSocketListenThread.join();
+        this->clientSocketListenThread.join();
     }
-    std::unique_lock<std::mutex> clientlock(this->clientSocketMutex);
     close(clientSocket);
-    std::unique_lock<std::mutex> lock(this->remoteSocketMutex);
     close(remoteSocket);
     std::cout << "[ConnectionBridge] Object deleted." << std::endl;
 }
@@ -56,14 +52,14 @@ void ConnectionBridge::listenClientSocket() {
         
     }
     std::cout << "[ConnectionBridge] Listening client thread stopped." << std::endl;
-    
+    this->running = false;
 }
 
 void ConnectionBridge::listenRemoteSocket() {
     char buffer[1500];
     int bytesRead;
     while ((bytesRead = recv(this->remoteSocket, buffer, sizeof(buffer), 0)) > 0 ) { // error
-        if(this->running == false) {
+        if(running == false) {
             break;
         }
         this->writeToClientSocket(buffer, bytesRead);
@@ -136,7 +132,7 @@ void ConnectionBridge::createTcpConnection(std::string& host) {
 }
 
 void ConnectionBridge::writeToClientSocket(char* data, size_t dataSize) {
-    std::unique_lock<std::mutex> lock(this->clientSocketMutex);
+
     if (this->clientSocket == -1) {
         std::cerr << "[ConnectionBridges] Client socket not set." << std::endl;
         return;
@@ -151,7 +147,6 @@ void ConnectionBridge::writeToClientSocket(char* data, size_t dataSize) {
 }
 
 void ConnectionBridge::writeToRemoteSocket(char* data, size_t dataSize) {
-    std::unique_lock<std::mutex> lock(this->remoteSocketMutex);
     if (this->remoteSocket == -1) {
         std::cerr << "[ConnectionBridge] Remote socket not set." << std::endl;
         return;
