@@ -8,6 +8,9 @@ TCPServer::TCPServer(int port) {
 
 TCPServer::~TCPServer() {
     this->running = false;
+    if(checkBridgesThread.joinable()) {
+        checkBridgesThread.join();
+    }
     shutdown(this->serverSocket, SHUT_RDWR);
     std::unique_lock<std::mutex> lock(this->vectorMutex);
     for (auto it = this->activeBridges->begin(); it != this->activeBridges->end();) {
@@ -23,7 +26,6 @@ TCPServer::~TCPServer() {
 
 int TCPServer::run() {
     checkBridgesThread = std::thread(&TCPServer::checkBridges, this);
-    checkBridgesThread.detach();
     
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
@@ -62,7 +64,7 @@ int TCPServer::run() {
         int clientSocket = accept(serverSocket, NULL, NULL);
         if (clientSocket == -1) {
             std::cerr << "[TCPServer] Error accepting client connection." << std::endl;
-            continue;
+            break;
         }
         std::cout << "[TCPServer] New client: " << clientSocket << std::endl;
         std::unique_lock<std::mutex> lock(this->vectorMutex);

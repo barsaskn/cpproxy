@@ -3,11 +3,19 @@
 #include "tcp_server.hpp"
 
 TCPServer* tcpServer;
+int interruptCount = 0;
+
 
 void handleSignal(int signum) {
     if(signum == SIGINT){
-        delete tcpServer;
-        std::cout << "[MAIN] App is closing..." << std::endl;
+        if (interruptCount < 1) {
+            interruptCount++;
+            delete tcpServer;
+            std::cout << "[MAIN] App is closing..." << std::endl;
+        }
+        else {
+            std::cout << "[MAIN] App is closing..." << std::endl;
+        }
     }
     else if (signum == SIGPIPE){
         std::cout << "[MAIN] SIGPIPE signal emmited" << std::endl;
