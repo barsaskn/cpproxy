@@ -44,7 +44,7 @@ void ConnectionBridge::listenClientSocket() {
             std::string host = this->parseHost(buffer, bytesRead);
             std::cout << "[ConnectionBridge] Parsed host: <" << host << ">" << std::endl;
             this->createTcpConnection(host);
-            char *message = "HTTP/1.1 200 OK\n\n\0";
+            char message[] = "HTTP/1.1 200 OK\n\n\0";
             this->writeToClientSocket(message, strlen(message));
         }
         else {
